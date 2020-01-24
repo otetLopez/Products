@@ -16,6 +16,7 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
     @IBOutlet weak var desclbl: UILabel!
     @IBOutlet weak var pricelbl: UILabel!
     
+    var currProduct : Int = 0
     var productList = [Product]()
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +34,15 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
         
         // Configure the View
         configureView(idx: 0)
+        
+        // Add these gestures to navigate products
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(swiped))
+        swipeRight.direction = UISwipeGestureRecognizer.Direction.right
+        view.addGestureRecognizer(swipeRight)
+        
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(swiped))
+        swipeRight.direction = UISwipeGestureRecognizer.Direction.left
+        view.addGestureRecognizer(swipeLeft)
     }
     
     func configureView(idx: Int) {
@@ -57,6 +67,21 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
         productList.append(Product(name: "Kinder", id: 10, desc: "Cream Filled Wafer Chocolate", price: 2.50))
     }
     
+    @objc func swiped (gesture: UISwipeGestureRecognizer) {
+        let swipeGesture = gesture as UISwipeGestureRecognizer
+            switch swipeGesture.direction {
+            case UISwipeGestureRecognizer.Direction.right:
+                currProduct += 1
+                currProduct = currProduct <= productList.count-1 ? currProduct : productList.count-1
+                configureView(idx: currProduct)
+            case UISwipeGestureRecognizer.Direction.left:
+                currProduct = currProduct == 0 ? productList.count-1 : currProduct - 1
+                configureView(idx: currProduct)
+            default:
+                break
+            }
+        
+    }
     
     func loadCoreData() {
         productList = [Product]()
