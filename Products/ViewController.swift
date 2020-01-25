@@ -138,9 +138,18 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate, UISe
         var nDesc: UITextField?
         var nPrice : UITextField?
         
-//        alertController.addTextField { (nName) in
-//            nName.placeholder = "Name"
-//        }
+        alertController.addTextField { (nName) in
+            nName.placeholder = "Product Name"
+        }
+        alertController.addTextField { (nId) in
+            nId.placeholder = "Product nId"
+        }
+        alertController.addTextField { (nDesc) in
+            nDesc.placeholder = "Product Description"
+        }
+        alertController.addTextField { (nPrice) in
+            nPrice.placeholder = "Product Price"
+        }
             
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         
@@ -151,6 +160,7 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate, UISe
                 print("This cannot be added")
             } else {
                 self.productList.append(Product(name: alertController.textFields![0].text!, id: Int(alertController.textFields![1].text!)!, desc: alertController.textFields![2].text!, price: Double(alertController.textFields![3].text!)!))
+                self.saveCoreData()
             }
             
         }
