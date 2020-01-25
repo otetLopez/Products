@@ -69,13 +69,22 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate, UISe
     
     func configureView(idx: Int) {
         
+        if resultSearchController.isActive && filteredTableData.count == 0 {
+            //Do not swipe
+                    namelbl!.text = productList[idx].getName()
+                    idlbl!.text = String(productList[idx].getID())
+                    desclbl!.text = productList[idx].getDesc()
+                    pricelbl!.text = String(productList[idx].getPrice())
+            
+                    instruction!.text = "Swipe Left/Right To Navigate All Products"
+        } else {
         namelbl!.text = resultSearchController.isActive ?  filteredTableData[idx].getName() : productList[idx].getName()
         idlbl!.text = resultSearchController.isActive ?  String(filteredTableData[idx].getID()) : String(productList[idx].getID())
         desclbl!.text = resultSearchController.isActive ?  filteredTableData[idx].getDesc() : productList[idx].getDesc()
         pricelbl!.text = resultSearchController.isActive ?  String(filteredTableData[idx].getPrice()) : String(productList[idx].getPrice())
 
         instruction!.text = resultSearchController.isActive ? "Swipe Left/Right To Navigate SEARCH RESULTS" : "Swipe Left/Right To Navigate ALL Products" 
-        
+        }
 //        namelbl!.text = productList[idx].getName()
 //        idlbl!.text = String(productList[idx].getID())
 //        desclbl!.text = productList[idx].getDesc()
@@ -155,12 +164,25 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate, UISe
         
         let addItemAction = UIAlertAction(title: "Add Product", style: .default) { (action) in
             let textField = alertController.textFields![0]
-            print("DEBUG: Will be adding folder \(textField.text!)")
             if (alertController.textFields![0].text!.isEmpty || alertController.textFields![1].text!.isEmpty || alertController.textFields![2].text!.isEmpty || alertController.textFields![3].text!.isEmpty) {
                 print("This cannot be added")
+                self.alertMessage(title: "Error", msg: "Fields/Some Fields are empty")
             } else {
-                self.productList.append(Product(name: alertController.textFields![0].text!, id: Int(alertController.textFields![1].text!)!, desc: alertController.textFields![2].text!, price: Double(alertController.textFields![3].text!)!))
-                self.saveCoreData()
+                let id = alertController.textFields![1].text!
+                let price = alertController.textFields![3].text!
+                if !id.isInt  {
+                    // Alert user error
+                    print("Input is not numerical")
+                    self.alertMessage(title: "Error", msg: "ID inputted is not numerical")
+                }
+                else if !price.isInt {
+                    // Alert user error
+                    print("Input is not numerical")
+                    self.alertMessage(title: "Error", msg: "Price inputted is not numerical")
+                } else {
+                    self.productList.append(Product(name: alertController.textFields![0].text!, id: Int(alertController.textFields![1].text!)!, desc: alertController.textFields![2].text!, price: Double(alertController.textFields![3].text!)!))
+                    self.saveCoreData()
+                }
             }
             
         }
@@ -170,6 +192,14 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate, UISe
         self.present(alertController, animated: true, completion: nil)
     }
     
+    func alertMessage(title: String, msg: String) {
+        let alertController = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+
+         let OkAction = UIAlertAction(title: "Got It!", style: .cancel, handler: nil)
+         alertController.addAction(OkAction)
+             
+         self.present(alertController, animated: true, completion: nil)
+    }
     
     func loadCoreData() {
         productList = [Product]()
@@ -233,6 +263,12 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate, UISe
         if let prodDelegate = segue.destination as? ProductsTableViewController {
                    prodDelegate.delegate = self
                }
+    }
+}
+
+extension String {
+    var isInt: Bool {
+        return Int(self) != nil
     }
 }
 
